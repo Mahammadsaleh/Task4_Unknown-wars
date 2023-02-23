@@ -6,10 +6,9 @@ $(".tanjiro .character-health").html(tanjiro_health);
 $(".zenitsu .character-health").html(zenitsu_health);
 $(".daki .character-health").html(daki_health);
 $(".gyutaro .character-health").html(gyutaro_health);
-var count = 0;
 var selectedChar;
-var defenderChar;
-var selChHealth = [];
+var selChHP = [];
+var enemyHP;
 var enemyClass;
 var selectedChampHP;
 var chars = {
@@ -20,29 +19,32 @@ var chars = {
 };
 $("#characters-section .select ").on("click", function () {
   selectedChar = $(this);
-  selChHealth.push(parseInt(selectedChar.children(".character-health").text()));
-
-  $("#selected-character").append(selectedChar);
-  var classOfSelected = this.className;
-  classOfSelected = classOfSelected.trim().split(" ").pop();
-  console.log(classOfSelected);
-  delete chars[classOfSelected];
-  for (var key in chars) {
-    $("#available-to-attack-section").append(chars[key]);
+  selChHP.push(parseInt(selectedChar.children(".character-health").text()));
+  if (selChHP.length == 1) {
+    $("#selected-character").append(selectedChar);
+    var classOfSelected = this.className;
+    classOfSelected = classOfSelected.trim().split(" ").pop();
+    console.log(classOfSelected);
+    delete chars[classOfSelected];
+    for (var key in chars) {
+      $("#available-to-attack-section").append(chars[key]);
+    }
   }
   $("#available-to-attack-section .select").on("click", function () {
     console.log("available to attack");
-    $("#defender").html(selectedChar);
-    enemyClass = this.className;
-    enemyClass = enemyClass.trim().split(" ").pop().toUpperCase();
+    if (document.querySelector("#defender").childNodes.length === 0) {
+      $("#defender").html(selectedChar);
+      enemyClass = this.className;
+      enemyClass = enemyClass.trim().split(" ").pop().toUpperCase();
+    }
   });
 });
+
 $("#attack-button").on("click", function () {
   selectedChampHP = document.querySelector(
     "#selected-character .character .character-health "
   );
-  var enemyHP = document.querySelector("#defender .select .character-health");
-
+  enemyHP = document.querySelector("#defender .select .character-health");
   var msg = document.createElement("div");
   const msgbox = $("#game-message");
   if (
@@ -51,7 +53,6 @@ $("#attack-button").on("click", function () {
   ) {
     var atckPoint1 = Math.floor(Math.random() * (50 - 10) + 10);
     var atckPoint2 = Math.floor(Math.random() * (30 - 10) + 10);
-
     enemyHP.innerHTML -= atckPoint1;
     selectedChampHP.innerHTML -= atckPoint2;
     msgbox.append(msg);
@@ -82,14 +83,14 @@ $("#attack-button").on("click", function () {
     parseInt(selectedChampHP.innerHTML) >= 0 &&
     parseInt(enemyHP.innerHTML) <= 0
   ) {
-    selectedChampHP.innerHTML = selChHealth[0];
+    selectedChampHP.innerHTML = selChHP[0];
     $("#defender .select").remove();
   }
   if (
     selectedChampHP.innerHTML > 0 &&
     document.querySelector("#defender").innerHTML == ""
   ) {
-    selectedChampHP.innerHTML = selChHealth[0];
+    selectedChampHP.innerHTML = selChHP[0];
     alert("You Won!");
   }
 });
